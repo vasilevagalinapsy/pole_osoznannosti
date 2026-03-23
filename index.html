@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поле осознанности — Галина Васильева</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF6F0;color:#2C1F14;min-height:100vh;display:flex;justify-content:center;padding:24px 16px 40px}
+.wrap{max-width:600px;width:100%}
+.head{text-align:center;margin-bottom:24px}
+.tag{display:inline-block;background:#C97B3A;color:#fff;font-size:11px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:10px}
+.title{font-size:1.6rem;font-weight:700;color:#2C1F14;margin-bottom:5px}
+.sub{font-size:14px;color:#7A5A3F}
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:20px}
+.c{border:1.5px solid #E8D5B8;border-radius:10px;background:#fff;padding:8px 4px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:68px;justify-content:center;transition:border-color .15s,background .15s,transform .1s;position:relative;user-select:none}
+.c:hover{border-color:#C97B3A;background:#FFF8F0;transform:scale(1.03)}
+.c.current{border:2px solid #C97B3A;background:#FFF3E5;transform:scale(1.05);z-index:2}
+.cn{font-size:9px;font-weight:600;color:#B08060;position:absolute;top:4px;left:6px}
+.ce{font-size:1.3rem;line-height:1}
+.ct{font-size:9px;color:#7A5A3F;text-align:center;line-height:1.35;padding:0 2px}
+.c.current .cn{color:#A5602D}
+.c.current .ct{color:#7A3A10}
+.dice-row{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:18px}
+.dice-wrap{display:flex;flex-direction:column;align-items:center;gap:7px}
+.dice{width:68px;height:68px;border-radius:14px;border:1.5px solid #DFC4A0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:2.2rem;transition:border-color .15s,transform .1s;user-select:none}
+.dice:hover{border-color:#C97B3A;background:#FFF8F0}
+.dice:active{transform:scale(.92)}
+.dice.spin{animation:ds .45s ease}
+@keyframes ds{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-18deg) scale(1.12)}70%{transform:rotate(18deg) scale(1.12)}100%{transform:rotate(0) scale(1)}}
+.dice-lbl{font-size:12px;color:#7A5A3F}
+.pos-box{display:flex;flex-direction:column;align-items:center;gap:3px}
+.pos-val{font-size:2.2rem;font-weight:700;color:#C97B3A;min-width:40px;text-align:center;line-height:1}
+.pos-lbl{font-size:11px;color:#7A5A3F}
+.result{border:1.5px solid #E8D5B8;border-radius:14px;background:#fff;padding:16px 18px;margin-bottom:16px;min-height:90px;transition:opacity .3s}
+.result.empty{opacity:.5}
+.r-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.r-num{font-size:11px;font-weight:600;color:#C97B3A;letter-spacing:1px;text-transform:uppercase}
+.r-emoji{font-size:1.5rem;line-height:1}
+.r-text{font-size:15px;color:#2C1F14;line-height:1.6;font-weight:500}
+.r-hint{font-size:13px;color:#7A5A3F;line-height:1.55;border-top:1px dashed #E8D5B8;padding-top:10px;margin-top:10px;font-style:italic}
+.cta{border:1.5px solid #DFC4A0;border-radius:14px;background:#FFF5E8;padding:16px 18px;margin-bottom:14px}
+.cta-title{font-size:14px;font-weight:700;color:#7A3A10;margin-bottom:6px}
+.cta-text{font-size:13px;color:#854F0B;line-height:1.6;margin-bottom:12px}
+.cta-btn{display:inline-block;background:#C97B3A;color:#fff;font-size:13px;font-weight:600;padding:10px 22px;border-radius:25px;text-decoration:none;transition:background .15s}
+.cta-btn:hover{background:#A5602D}
+.reset{font-size:12px;color:#B08060;text-align:center;cursor:pointer;text-decoration:underline;margin-top:2px}
+.reset:hover{color:#7A5A3F}
+.footer{text-align:center;font-size:11px;color:#B08060;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="tag">🎲 игра</div>
+    <div class="title">Поле осознанности</div>
+    <div class="sub">Брось кубик — двигайся вперёд — получи практику</div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="dice-row">
+    <div class="dice-wrap">
+      <div class="dice" id="dice" onclick="roll()">🎲</div>
+      <span class="dice-lbl">бросить кубик</span>
+    </div>
+    <div class="pos-box">
+      <div class="pos-val" id="posVal">—</div>
+      <div class="pos-lbl">текущая клетка</div>
+    </div>
+  </div>
+
+  <div class="result empty" id="result">
+    <div class="r-top">
+      <span class="r-emoji" id="rEmoji">🎲</span>
+      <span class="r-num" id="rNum">бросьте кубик, чтобы начать</span>
+    </div>
+    <div class="r-text" id="rText">Каждый ход — маленькая встреча с собой</div>
+    <div class="r-hint" id="rHint" style="display:none"></div>
+  </div>
+
+  <div class="cta">
+    <div class="cta-title">Хочется глубже — приходи на Лилу.</div>
+    <div class="cta-text">Игра Лила — это пространство, где можно получить настоящую ясность: выйти из застревания, разобраться с тем, что давно тяготит, и сделать шаг, который вы откладываете.</div>
+    <a class="cta-btn" href="https://t.me/galina_psy" target="_blank">Записаться на Лилу</a>
+  </div>
+
+  <div class="reset" onclick="resetGame()">начать сначала</div>
+
+  <div class="footer">Галина Васильева · @vasileva_igra</div>
+
+</div>
+
+<script>
+const cells=[
+  {e:"🌸",s:"Вспомни момент, когда ты позволила себе ничего не делать.",h:"Как это ощущалось? Было ли чувство вины — или всё же облегчение?"},
+  {e:"💭",s:"Что ты говоришь себе, когда устала?",h:"Скажи то же самое — но мягким голосом, как близкой подруге."},
+  {e:"🔑",s:"Есть что-то, в чём ты держишь себя «в рамках»?",h:"Назови это. Просто признай — без осуждения."},
+  {e:"☕",s:"Выпей что-нибудь горячее медленно. Только это. Больше ничего.",h:"Не читай, не листай. Просто чувствуй тепло."},
+  {e:"🌿",s:"Что тебе хочется прямо сейчас — но ты обычно это откладываешь?",h:"Можно ли сделать хоть маленький шаг к этому сегодня?"},
+  {e:"💎",s:"Назови одно качество, которым ты втайне гордишься.",h:"Не минимизируй. Просто прими это как факт."},
+  {e:"🌙",s:"Когда последний раз ты делала что-то только для себя — без объяснений?",h:"Что мешает делать это чаще?"},
+  {e:"🏃",s:"Что ты «должна» сделать сегодня? А чего на самом деле хочешь?",h:"Замечаешь разницу между этими списками?"},
+  {e:"🌺",s:"Напиши три слова о том, какая ты есть — не какой должна быть.",h:"Три настоящих слова. Без фильтров."},
+  {e:"🔥",s:"Что тебя раздражает прямо сейчас?",h:"Раздражение — это сигнал. Какая потребность за ним стоит?"},
+  {e:"🌊",s:"Представь: вечер только твой. Что ты делаешь?",h:"Это подсказка о том, чего тебе не хватает."},
+  {e:"💌",s:"Напиши себе одно предложение поддержки.",h:"Именно то, что хочется услышать. От себя."},
+  {e:"🌻",s:"Что дало тебе силы на этой неделе? Даже самое маленькое.",h:"Замечать источники силы — это навык."},
+  {e:"🎭",s:"Перед кем ты сегодня «играла роль»?",h:"Как это ощущалось в теле? Что стоило сил?"},
+  {e:"🧩",s:"Есть решение, которое ты откладываешь?",h:"Что мешает — страх ошибиться или страх изменений?"},
+  {e:"🌈",s:"Что сегодня было хорошо — хотя бы одна вещь?",h:"Мозг склонен замечать плохое. Намеренно ищи хорошее."},
+  {e:"✨",s:"Что ты разрешаешь себе реже, чем хотела бы?",h:"Почему? Чьё «нельзя» ты слышишь?"},
+  {e:"🌱",s:"Есть что-то, что ты начала — и бросила. Без осуждения: почему?",h:"Иногда остановка — это мудрость, а не слабость."},
+  {e:"🦋",s:"Какой была бы ты, если бы не боялась?",h:"Опиши её. Может, она уже рядом?"},
+  {e:"🌟",s:"Вспомни комплимент, который тебя тронул. Почему именно он?",h:"Это — что-то важное о твоих ценностях."},
+  {e:"🔮",s:"Что тебе нужно услышать прямо сейчас?",h:"Скажи это себе. Вслух или шёпотом."},
+  {e:"🍂",s:"Где ты теряешь энергию — и что можно изменить?",h:"Одно маленькое изменение. Не список реформ."},
+  {e:"🎯",s:"Одна вещь, которая сделает завтра чуть лучше. Только одна.",h:"Не список. Именно одна."},
+  {e:"💛",s:"Что ты не позволяешь себе хотеть?",h:"Назови это. Просто назови — без оценки."},
+  {e:"🌼",s:"Ты справляешься. Запиши одно доказательство этого.",h:"Даже если сегодня было тяжело — что-то всё равно получилось."}
+];
+
+const diceSyms=["⚀","⚁","⚂","⚃","⚄","⚅"];
+let pos=0;
+
+const board=document.getElementById("board");
+cells.forEach((c,i)=>{
+  const d=document.createElement("div");
+  d.className="c";
+  d.id="c"+(i+1);
+  const preview=c.s.length>26?c.s.substring(0,26)+"…":c.s;
+  d.innerHTML=`<span class="cn">${i+1}</span><span class="ce">${c.e}</span><span class="ct">${preview}</span>`;
+  d.onclick=()=>goTo(i+1);
+  board.appendChild(d);
+});
+
+function goTo(n){
+  pos=n;
+  document.querySelectorAll(".c").forEach(el=>el.classList.remove("current"));
+  document.getElementById("c"+n).classList.add("current");
+  const cl=cells[n-1];
+  document.getElementById("rNum").textContent="Клетка "+n;
+  document.getElementById("rEmoji").textContent=cl.e;
+  document.getElementById("rText").textContent=cl.s;
+  const hint=document.getElementById("rHint");
+  hint.textContent=cl.h;
+  hint.style.display="block";
+  document.getElementById("result").classList.remove("empty");
+  document.getElementById("posVal").textContent=n;
+  document.getElementById("c"+n).scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function roll(){
+  const dice=document.getElementById("dice");
+  dice.classList.remove("spin");
+  void dice.offsetWidth;
+  dice.classList.add("spin");
+  let count=0;
+  const iv=setInterval(()=>{
+    dice.textContent=diceSyms[Math.floor(Math.random()*6)];
+    count++;
+    if(count>10){
+      clearInterval(iv);
+      const rolled=Math.floor(Math.random()*6)+1;
+      dice.textContent=diceSyms[rolled-1];
+      const newPos=pos===0?rolled:((pos-1+rolled)%25)+1;
+      goTo(newPos);
+    }
+  },50);
+}
+
+function resetGame(){
+  pos=0;
+  document.querySelectorAll(".c").forEach(el=>el.classList.remove("current"));
+  document.getElementById("posVal").textContent="—";
+  document.getElementById("rNum").textContent="бросьте кубик, чтобы начать";
+  document.getElementById("rEmoji").textContent="🎲";
+  document.getElementById("rText").textContent="Каждый ход — маленькая встреча с собой";
+  document.getElementById("rHint").style.display="none";
+  document.getElementById("result").classList.add("empty");
+  document.getElementById("dice").textContent="🎲";
+}
+</script>
+</body>
+</html>
